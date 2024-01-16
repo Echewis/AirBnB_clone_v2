@@ -73,7 +73,7 @@ class HBNBCommand(cmd.Cmd):
                 pline = pline[2].strip()  # pline is now str
                 if pline:
                     # check for *args or **kwargs
-                    if pline[0] is '{' and pline[-1] is'}'\
+                    if pline[0] is '{' and pline[-1] is '}'\
                             and type(eval(pline)) is dict:
                         _args = pline
                     else:
@@ -115,16 +115,63 @@ class HBNBCommand(cmd.Cmd):
 
     def do_create(self, args):
         """ Create an object of any class"""
-        if not args:
+        ignored_attrs = ('id', 'created_at', 'updated_at', '__class__')
+        clazz_name = ''
+        name_pattern = r'(?P<name>(?:[a-zA-Z]|_)(?:[a-zA-Z]|\d|_)*)'
+        class_match = re.match(name_pattern, args)
+        obj_kwargs = {}
+        if class_match is not None:
+            clazz_name = class_match.group('name')
+            params_str = args[len(clazz_name):].strip()
+            params = params_str.split(' ')
+            str_pattern = r'(?P<t_str>"([^"]|\")*")'
+            float_pattern = r'(?P<t_float>[-+]?\d+\.\d+)'
+            int_pattern = r'(?P<t_int>[-+]?\d+)'
+            param_pattern = '{}=({}|{}|{})'.format(
+                name_pattern,
+                str_pattern,
+                float_pattern,
+                int_pattern
+            )
+            for pa in params:
+                parameter_matching = re.fullmatch(param_pattern, pa)
+                if parameter_matching is not None:
+                    key_namez = parameter_matching.group('name')
+                    string_v = parameter_matching.group('t_str')
+                    float_v = parameter_matching.group('t_float')
+                    integer_v = parameter_matching.group('t_int')
+                    if float_v is not None:
+                        obj_kwargs[key_namez] = float(float_v)
+                    if integer_v is not None:
+                        obj_kwargs[key_namez] = int(integer_v)
+                    if string_v is not None:
+                        obj_kwargs[key_namez] = string_v[1:-1].replace('_',
+                                                                       ' ')
+        else:
+            clazz_name = args
+        if not clazz_name:
             print("** class name missing **")
             return
-        elif args not in HBNBCommand.classes:
+        elif clazz_name not in HBNBCommand.classes:
             print("** class doesn't exist **")
             return
-        new_instance = HBNBCommand.classes[args]()
-        storage.save()
-        print(new_instance.id)
-        storage.save()
+        if os.getenv('HBNB_TYPE_STORAGE') == 'db':
+            if not hasattr(obj_kwargs, 'id'):
+                obj_kwargs['id'] = str(uuid.uuid4())
+            if not hasattr(obj_kwargs, 'created_at'):
+                obj_kwargs['created_at'] = str(datetime.now())
+            if not hasattr(obj_kwargs, 'updated_at'):
+                obj_kwargs['updated_at'] = str(datetime.now())
+            new_instance = HBNBCommand.classes[clazz_name](**obj_kwargs)
+            new_instance.save()
+            print(new_instance.id)
+        else:
+            new_instance = HBNBCommand.classes[clazz_name]()
+            for key, value in obj_kwargs.items():
+                if key not in ignored_attrs:
+                    setattr(new_instance, key, value)
+            new_instance.save()
+            print(new_instance.id)
 
     def help_create(self):
         """ Help information for the create method """
@@ -187,7 +234,7 @@ class HBNBCommand(cmd.Cmd):
         key = c_name + "." + c_id
 
         try:
-            del(storage.all()[key])
+            del (storage.all()[key])
             storage.save()
         except KeyError:
             print("** no instance found **")
@@ -230,7 +277,7 @@ class HBNBCommand(cmd.Cmd):
 
     def help_count(self):
         """ """
-        print("Usage: count <class_name>")
+        print("Usage: count <clazz_name>")
 
     def do_update(self, args):
         """ Updates a certain object with new info """
@@ -319,6 +366,7 @@ class HBNBCommand(cmd.Cmd):
         """ Help information for the update class """
         print("Updates an object with new information")
         print("Usage: update <className> <id> <attName> <attVal>\n")
+
 
 if __name__ == "__main__":
     HBNBCommand().cmdloop()
