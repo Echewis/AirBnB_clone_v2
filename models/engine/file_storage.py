@@ -9,24 +9,24 @@ class FileStorage:
     __objects = {}
 
     def all(self, cls=None):
-        """Will return a dictionary of models currently in storage"""
+        """This will return a dictionary of models currently in storage"""
         if cls is None:
             return self.__objects
-        cls_name = cls.__name__
+        class_name = cls.__name__
         dct = {}
         for key in self.__objects.keys():
-            if key.split('.')[0] == cls_name:
+            if key.split('.')[0] == class_name:
                 dct[key] = self.__objects[key]
         return dct
 
     def new(self, obj):
-        """Will add new object to storage dictionary"""
+        """This will add new object to storage dictionary"""
         self.__objects.update(
             {obj.to_dict()['__class__'] + '.' + obj.id: obj}
             )
 
     def save(self):
-        """Will Save storage dictionary to file"""
+        """This will Save storage dictionary to file"""
         with open(self.__file_path, 'w') as f:
             temp = {}
             temp.update(self.__objects)
@@ -36,13 +36,13 @@ class FileStorage:
 
     def reload(self):
         """Loads storage dictionary from file"""
-        from models.base_model import BaseModel
         from models.user import User
         from models.place import Place
         from models.state import State
-        from models.city import City
+        from models.base_model import BaseModel
         from models.amenity import Amenity
         from models.review import Review
+        from models.city import City
 
         classes = {
                     'BaseModel': BaseModel, 'User': User, 'Place': Place,
@@ -59,14 +59,14 @@ class FileStorage:
             pass
 
     def delete(self, obj=None):
-        """WIll deletes the object obj from the attribute
-            __objects if it's inside it
+        """ 
+            This will delete the object from the attribute
         """
         if obj is None:
             return
-        obj_key = obj.to_dict()['__class__'] + '.' + obj.id
-        if obj_key in self.__objects.keys():
-            del self.__objects[obj_key]
+        object_key = obj.to_dict()['__class__'] + '.' + obj.id
+        if object_key in self.__objects.keys():
+            del self.__objects[object_key]
 
     def close(self):
         """Will Call the reload method"""
