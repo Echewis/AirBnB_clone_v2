@@ -1,14 +1,14 @@
 #!/usr/bin/python3
-""" State Module for HBNB project """
-from models.base_model import BaseModel, Base
-from models import storage_type
-from models.city import City
+""" This is a state Module for HBNB project """
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
+from models import storage_type
+from models.city import City
+from models.base_model import BaseModel, Base
 
 
 class State(BaseModel, Base):
-    """ State class / table model"""
+    """ It's a state class / table model"""
     __tablename__ = 'states'
     if storage_type == 'db':
         name = Column(String(128), nullable=False)
@@ -19,10 +19,8 @@ class State(BaseModel, Base):
 
         @property
         def cities(self):
-            '''returns the list of City instances with state_id
-                equals the current State.id
-                FileStorage relationship between State and City
-            '''
+            """This will return the list of City instances with state_id
+            """
             from models import storage
             related_cities = []
             cities = storage.all(City)
