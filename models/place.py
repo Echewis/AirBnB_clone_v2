@@ -1,12 +1,12 @@
 #!/usr/bin/python3
-""" Place Module for HBNB project """
+""" This is Place Module for HBNB project """
+from models import storage_type
+from models.base_model import BaseModel, Base
 from models.amenity import Amenity
 from models.review import Review
-from models.base_model import BaseModel, Base
-from models import storage_type
-from sqlalchemy import Column, String, Integer, Float, ForeignKey
 from sqlalchemy.sql.schema import Table
 from sqlalchemy.orm import relationship
+from sqlalchemy import Column, String, Integer, Float, ForeignKey
 
 
 if storage_type == 'db':
@@ -23,7 +23,7 @@ if storage_type == 'db':
 
 
 class Place(BaseModel, Base):
-    """ A place to stay """
+    """ This is the place to stay """
     __tablename__ = 'places'
     if storage_type == 'db':
         city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
@@ -55,39 +55,34 @@ class Place(BaseModel, Base):
 
         @property
         def reviews(self):
-            ''' returns list of review instances with place_id
-                equals to the cyrrent Place.id
-                FileStorage relationship between Place and Review
-            '''
+            """This will return a list of review instances with place_id"""
             from models import storage
             all_revs = storage.all(Review)
-            lst = []
-            for rev in all_revs.values():
-                if rev.place_id == self.id:
-                    lst.append(rev)
-            return lst
+            Listz = []
+            for revz in all_revs.values():
+                if revz.place_id == self.id:
+                    Listz.append(revz)
+            return Listz
 
         @property
         def amenities(self):
-            ''' returns the list of Amenity instances
-                based on the attribute amenity_ids that
-                contains all Amenity.id linked to the Place
-            '''
+            """ Thi will return the list of Amenity instances
+                based on the attribute amenity_ids
+            """
             from models import storage
             all_amens = storage.all(Amenity)
-            lst = []
+            Listz = []
             for amen in all_amens.values():
                 if amen.id in self.amenity_ids:
-                    lst.append(amen)
-            return lst
+                    Listz.append(amen)
+            return Listz
 
         @amenities.setter
-        def amenities(self, obj):
-            ''' method for adding an Amenity.id to the
-                attribute amenity_ids. accepts only Amenity
-                objects
-            '''
-            if obj is not None:
-                if isinstance(obj, Amenity):
-                    if obj.id not in self.amenity_ids:
-                        self.amenity_ids.append(obj.id)
+        def amenities(self, Objectz):
+            """This ia the method that will add an Amenity.id to the
+                attribute amenity_ids
+            """
+            if Objectz is not None:
+                if isinstance(Objectz, Amenity):
+                    if Objectz.id not in self.amenity_ids:
+                        self.amenity_ids.append(Objectz.id)
