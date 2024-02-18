@@ -31,7 +31,7 @@ def c(text):
 @application.route("/python", strict_slashes=False)
 @application.route("/python/<text>", strict_slashes=False)
 def python(text="is cool"):
-    """Displays 'Python' followed by the value of <text>
+    """This will display 'Python' followed by the value of <text>
     Replaces any underscores in <text> with slashes.
     """
     text = text.replace("_", " ")
@@ -40,13 +40,13 @@ def python(text="is cool"):
 
 @application.route("/number/<int:n>", strict_slashes=False)
 def number(n):
-    """Displays 'n is a number' only if <n> is an integer."""
+    """This will display 'n is a number' only if <n> is an integer."""
     return "{} is a number".format(n)
 
 
 @application.route("/number_template/<int:n>", strict_slashes=False)
 def number_template(n):
-    """Displays an HTML page only if <n> is an integer."""
+    """This will display an HTML page only if <n> is an integer."""
     return render_template("5-number.html", n=n)
 
 
